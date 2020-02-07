@@ -1,0 +1,53 @@
+
+
+<div id="bar" class="bar">
+<span id= "pivot" class="pivot"></span>
+</div>
+<script>
+let root = document.documentElement;
+var sizeObj={}
+root.addEventListener("mousemove", e => {
+  root.style.setProperty('--mouse-x', e.clientX + "px");
+  let value=calculateValue(e);
+  root.style.setProperty('--size-left', sizeObj.value + "%");
+  root.style.setProperty('--size-width', sizeObj.width);
+	console.log("mousemove");
+  
+});
+function calculateValue(e){
+	
+	let barWidth=document.getElementById("bar").offsetWidth-document.getElementById("bar").offsetLeft;
+	let clientSelection=e.clientX;
+	let value=(clientSelection/barWidth)*100;
+	sizeObj.value=value;
+	sizeObj.width=e.clientX;
+	return sizeObj;
+
+}
+</script>
+<style>
+.bar
+{
+width: auto;
+    height: 10px;
+    margin: 0 auto;
+    position: relative;
+ background:darkseagreen;
+width: auto;
+}
+.bar:before{
+    content: '';
+    position: absolute;
+     width:var(--size-width);
+    left:var(--size-left);
+    height:140%;
+    background: lightgrey;
+}
+.pivot {
+  width: 50px;
+  height: 50px;
+  background: red;
+  position: absolute;
+  left: var(--mouse-x);
+}
+</style>
