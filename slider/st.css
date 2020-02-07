@@ -1,0 +1,31 @@
+
+div {
+	width: auto;
+    height: 10px;
+    margin: 0 auto;
+    position: relative;
+}
+.c {
+    background: darkseagreen;
+}
+
+.c:before{
+    content: '';
+    position: absolute;
+    width:40%;
+    left:var(--size-left);
+    height:140%;
+    background:lightgrey;
+}
+ .dragger{
+    display: block;
+    width: 10px;
+    height: inherit;
+    position: relative;
+    z-index: 2;
+    background-color: red;
+    cursor: inherit;
+ }
+
+
+   
