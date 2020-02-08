@@ -1,53 +1,94 @@
 
 
-<div id="bar" class="bar">
-<span id= "pivot" class="pivot"></span>
-</div>
+<div id="bar" class="bar" data-max=100 data-min=0 data-position=0></div>
+<div id= "pivot" class="pivot"></div>
+<div id="valueId">Value= <span id="numValue"></span></div>
 <script>
+let bar = document.getElementById("bar");
+let pivot = document.getElementById("pivot");
 let root = document.documentElement;
-var sizeObj={}
-root.addEventListener("mousemove", e => {
-  root.style.setProperty('--mouse-x', e.clientX + "px");
-  let value=calculateValue(e);
-  root.style.setProperty('--size-left', sizeObj.value + "%");
-  root.style.setProperty('--size-width', sizeObj.width);
-	console.log("mousemove");
+var sizeObj={};
+populateSizeObj(bar);
+if(sizeObj.position>0)
+{
+  let providedPos=((sizeObj.position*sizeObj.barSize)/sizeObj.range)+sizeObj.baroOffSetX;
+  setStyles(providedPos);
   
+  sizeObj.clickedPosition=providedPos;
+  calculate();
+}
+bar.addEventListener("click", e => {
+  	calculateValueFromBarClick(e);
+  	console.log(sizeObj);
 });
-function calculateValue(e){
-	
-	let barWidth=document.getElementById("bar").offsetWidth-document.getElementById("bar").offsetLeft;
-	let clientSelection=e.clientX;
-	let value=(clientSelection/barWidth)*100;
-	sizeObj.value=value;
-	sizeObj.width=e.clientX;
-	return sizeObj;
 
+root.addEventListener("mousemove", e => {
+	if("pivot".localeCompare(e.target.id)){
+		 setStyles(e.clientX);
+		calculateValueFromPivot(e);
+		console.log(sizeObj);
+	}
+});
+function setStyles(postion)
+{
+	bar.style.width=bar.clientWidth;
+	pivot.style.setProperty('--mouse-x', postion + "px");
+	bar.style.setProperty('--mouse-x', postion + "px");
+}
+function populateSizeObj(bar)
+{
+	sizeObj.barSize=bar.clientWidth;
+	sizeObj.baroOffSetX=bar.offsetLeft;
+	sizeObj.max=parseInt(bar.dataset.max);
+	sizeObj.min=parseInt(bar.dataset.min);
+	sizeObj.position=parseInt(bar.dataset.position);
+	sizeObj.range=sizeObj.max-sizeObj.min;
+	console.log(sizeObj);
+}
+function calculateValueFromPivot(e){
+	
+	let clickedPosition=e.clientX-sizeObj.baroOffSetX;
+	sizeObj.clickedPosition=clickedPosition;
+	calculate();
+}
+function calculateValueFromBarClick(e){
+	
+	let clickedPosition=e.offsetX;
+	sizeObj.clickedPosition=clickedPosition;
+	calculate();
+}
+function calculate(){
+	
+	let clickedPosition=sizeObj.clickedPosition;
+	value=(sizeObj.range*clickedPosition)/sizeObj.barSize;
+	sizeObj.value=parseInt(value);
+	populateValue();
+}
+function populateValue()
+{
+	document.getElementById("numValue").innerHTML=sizeObj.value;
 }
 </script>
 <style>
 .bar
 {
-width: auto;
+    width:auto;
     height: 10px;
     margin: 0 auto;
     position: relative;
- background:darkseagreen;
-width: auto;
+    background:darkseagreen;
+    width: auto;
+    border-left: var(--mouse-x) solid grey;
 }
-.bar:before{
-    content: '';
-    position: absolute;
-     width:var(--size-width);
-    left:var(--size-left);
-    height:140%;
-    background: lightgrey;
-}
+
 .pivot {
-  width: 50px;
+  width: 10px;
   height: 50px;
   background: red;
   position: absolute;
   left: var(--mouse-x);
+}
+#valueId{
+    padding-top: 50px;
 }
 </style>

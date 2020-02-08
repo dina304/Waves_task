@@ -3,20 +3,25 @@
 // Refers to the "importee", which is custom_slider.html
  var thisDoc = (hostedDoc._currentScript || hostedDoc.currentScript).ownerDocument;
  var template = thisDoc.querySelector( 'template' ).content;
- 
- var sizes={};
+ var sizeObj={};
+ var bar = template.getElementById("bar");
+ var pivot = template.getElementById("pivot");
+ var root = template.documentElement;
  var minRange,maxRange,position,maxSize;
   class CustSlider extends HTMLElement {
-	  
-	
+	 
 	  constructor() {
 		  super();
-		  var newPos = 0, currentPos = 0;
-		 
-		  this.addEventListener("onmousemove", e => {
-			     console.log("onmousemove");
-			     this.elementDrag(e)
-			    });
+		  this.addEventListener("click", e => {
+			
+			  	this.calculateValueFromBarClick(e);
+			});
+		  this.addEventListener("mousemove", e => {
+			  if("pivot".localeCompare(e.target.id)){
+					this.setStyles(e.clientX);
+					this.calculateValueFromPivot(e);
+				}
+			});
 
 	  }
 	  connectedCallback(){
@@ -24,34 +29,65 @@
 	  var shadowRoot = this.attachShadow({mode:'open'});
       var clone = hostedDoc.importNode( template, true );
       shadowRoot.appendChild(clone);
-      
-      let sliderBar=template.getElementById("sliderBar");
-      this.maxSize=sliderBar.style.width;
+
+      this.populateSizeObj(bar);
+      if(sizeObj.position>0)
+      {
+        let providedPos=((sizeObj.position*sizeObj.barSize)/sizeObj.range)+sizeObj.baroOffSetX;
+        this.setStyles(providedPos);
+        
+        this.sizeObj.clickedPosition=providedPos;
+        this.calculate();
+      }
    
-      this.minRange = this.getAttribute("minRange");
-      console.log(minRange);
-      this.maxRange = this.getAttribute("maxRange");
-      console.log(maxRange);
-      this.position = this.getAttribute("position");
-      console.log(position);
+      sizeObj.min = this.getAttribute("minRange");
+      console.log(sizeObj.min);
+      sizeObj.max = this.getAttribute("maxRange");
+      console.log(sizeObj.max);
+      sizeObj.position  = this.getAttribute("position");
+      console.log(sizeObj.position);
     
 	  }
 
-	   elementDrag(e) {
-		   let pivot=template.getElementById("pivot");
-		    e = e || window.event;
-		    e.preventDefault();
-		    // calculate the new cursor position:
-		    this.newPos = this.currentPos - e.clientX;
-		    this.currentPos = e.clientX;
-		     set the element's new position:
-		    
-		    pivot.style.left = e.clientX+ "px";//(pivot.offsetLeft - this.newPos) + "px";
-		    let value=(this.maxSize*this.newPos)/(this.maxRange-this.minRange);
-		    template.getElementById("value").innerHTML= value;
-		    template.getElementById("sliderBar").style.setProperty('--size-left', (value/(maxRange-minRange))*100 + "%");
-		  }
-
+	   setStyles(postion)
+	  {
+	  	bar.style.width=bar.clientWidth;
+	  	pivot.style.setProperty('--mouse-x', postion + "px");
+	  	bar.style.setProperty('--mouse-x', postion + "px");
+	  }
+	   populateSizeObj(bar)
+	  {
+	  	sizeObj.barSize=bar.clientWidth;
+	  	sizeObj.baroOffSetX=bar.offsetLeft;
+	  	sizeObj.max=parseInt(this.maxRange);
+	  	sizeObj.min=parseInt(this.minRange);
+	  	sizeObj.position=parseInt(this.position);
+	  	sizeObj.range=sizeObj.max-sizeObj.min;
+	  	console.log(sizeObj);
+	  }
+	   calculateValueFromPivot(e){
+	  	
+	  	let clickedPosition=e.clientX-sizeObj.baroOffSetX;
+	  	sizeObj.clickedPosition=clickedPosition;
+	  	this.calculate();
+	  }
+	   calculateValueFromBarClick(e){
+	  	
+	  	let clickedPosition=e.offsetX;
+	  	sizeObj.clickedPosition=clickedPosition;
+	  	this.calculate();
+	  }
+	   calculate(){
+	  	
+	  	let clickedPosition=sizeObj.clickedPosition;
+	  	let value=(sizeObj.range*clickedPosition)/sizeObj.barSize;
+	  	sizeObj.value=parseInt(value);
+	  	this.populateValue();
+	  }
+	   populateValue()
+	  {
+		   template.getElementById("num").innerHTML=sizeObj.value;
+	  }
 	}
 
   window.customElements.define('cust-slider',CustSlider);

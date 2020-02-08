@@ -1,31 +1,22 @@
-
-div {
-	width: auto;
+.bar
+{
+    width:auto;
     height: 10px;
     margin: 0 auto;
     position: relative;
-}
-.c {
-    background: darkseagreen;
+    background:darkseagreen;
+    width: auto;
 }
 
-.c:before{
-    content: '';
-    position: absolute;
-    width:40%;
-    left:var(--size-left);
-    height:140%;
-    background:lightgrey;
+.pivot {
+  width: 10px;
+  height: 50px;
+  background: red;
+  position: absolute;
+  left: var(--mouse-x);
 }
- .dragger{
-    display: block;
-    width: 10px;
-    height: inherit;
-    position: relative;
-    z-index: 2;
-    background-color: red;
-    cursor: inherit;
- }
-
+#value{
+    padding-top: 50px;
+}
 
    
